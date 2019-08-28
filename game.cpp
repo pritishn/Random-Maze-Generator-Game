@@ -1,115 +1,112 @@
 #include <bits/stdc++.h>
 #include <SFML/Graphics.hpp>
 using namespace std;
-using namespace sf;
- int screenWidth;                // Console screen size X (columns)
- int screenHeight;
+int World[10][10] =
+	{
+		{1,1,1,1,1,1,1,1,1,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,1},
+		{1,1,1,1,1,1,1,1,1,1}
+	};
 
-int map[10][10]=
+double Convert(double radian)
 {
-				 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ,
-				 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ,
-};
+	double pi = 3.14159;
+	return (radian * (180 / pi));
+}
 
 int main()
 {
 
-    sf::RenderWindow window(sf::VideoMode(500, 500), "Prototype!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+	sf::RenderWindow window(sf::VideoMode(700, 700), "Prototype!");
+	window.setFramerateLimit(60);
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+	double centerLineDistance;
+	double playerX = 4.0, playerY = 4.0;
+	double playerAngle = 0.0;
+	double dX, dY, stepY, stepX;
+	double playerStepSize = 0.0007;
+	sf::Text t;
+	sf::Font font;
+	font.loadFromFile("Arial.ttf");
 
-        
-    
+	
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+		dX = ceil(playerX) - playerX;
+		dY = playerY - floor(playerY);
+		stepX = 0;
+		stepY = 0;
+		int rayX = 0, rayY = 0;
+		if (sf::Event::KeyPressed){
 
-    
-		float playerX=1.0,playerY=1.0;
-		float playerAngle=0;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			{
+				playerX += playerStepSize * cos(playerAngle);
+				playerY += playerStepSize * sin(playerAngle);
+			}
 
-		float dX,dY;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			playerX -= playerStepSize * cos(playerAngle);
+			playerY -= playerStepSize * sin(playerAngle);
+		}
 
-		float playerStepSize=0.5;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			playerAngle += 0.0001;
 
-		char key_code;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			playerAngle -= 0.0001;
+
+		while (stepX<=10&&stepY<=10)
+		{
+
+			if((dY + stepY) / sin(playerAngle) < (dX + stepX) / cos(playerAngle))
+			{
+				rayY = playerY-(dY + stepY);
+				rayX = playerX+stepX;
+				if(World[rayX][rayY])
+				{
+						centerLineDistance = (dY + stepY) / sin(playerAngle);
+						break;
+				}
+				stepY++;
+			}
+			else
+			{
+
+				rayX = playerX + (dX + stepX);
+				rayY = ceil(playerY-stepY);//+(dX+stepX)*tan(playerAngle);
+				if (World[rayX][rayY])
+					{
+						centerLineDistance = (dX + stepX) / cos(playerAngle);
+						break;
+					}
+				stepX++;
+			}
+		}
 		
+		}
 
-
-		 switch(key_code)
-						{
-								//forward
-								case 119:
-								case 87:
-											playerX+=playerStepSize*cos(playerAngle);
-											playerY+=playerStepSize*sin(playerAngle);
-
-										break;
-
-								//backwards
-								case 115:
-								case 83:
-
-											playerX-=playerStepSize*cos(playerAngle);
-											playerY-=playerStepSize*sin(playerAngle);
-										break;
-
-
-								//left
-								case 65:
-								case 97:
-										playerAngle+=0.1;
-										break;
-
-
-								//right
-								case 100:
-								case 68:
-
-										playerAngle-=0.1;
-										break;
-
-
-						}
-         window.clear();
-						
-						//{
-							 // left key is pressed: move our character
-                            sf::Font font;
-                            font.loadFromFile("Arial.ttf");
-                            sf::Text text("hello",font);
-                          if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))  text.setFillColor(sf::Color::Red);
-                          else text.setFillColor(sf::Color::Blue);
-							window.draw(text);
-					//	}
-					
-
-		
-
-       
-        //window.draw(shape);
-        window.display();
-    }
-		//rotate FOV by 'b' angletext.setFillColor(sf::Color::Red);
-	/*
-		x=dirX*cos(b)-dirY*sin(b);
-		y=dirX*sin(b)+dirY*cos(b);
-		dirX=x;
-		dirY=y;
-	*/
-
+		string displayText = "X:" + to_string(playerX) + ",Y:" + to_string(playerY) + ",A:" + to_string(Convert(playerAngle)) + ",nWX:" + to_string(rayX) + ",nWY:" + to_string(rayY)+",dist:"+to_string(centerLineDistance);
+		t.setString(displayText);
+		t.setFont(font);
+		t.setCharacterSize(14);
+		window.clear();
+		window.draw(t);
+		window.display();
+	}
+	return 0;
 }
