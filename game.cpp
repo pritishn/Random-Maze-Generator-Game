@@ -27,7 +27,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(700, 700), "Prototype!");
 	window.setFramerateLimit(60);
 
-	double centerLineDistance;
+	double centerLineDistance=0.0;
 	double playerX = 4.0, playerY = 4.0;
 	double playerAngle = 0.0;
 	double dX, dY, stepY, stepX;
@@ -70,7 +70,22 @@ int main()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			playerAngle -= 0.0001;
 
-		while (stepX<=10&&stepY<=10)
+		/*
+			*** put a function to keep player angle under 2pie ***
+
+		*/
+		/*
+
+			put 4 functions to calculate distances 
+			function to represent each quadrants 
+			 getDistanceWhenAngleLiesBetween0to90
+			 getDistanceWhenAngleLiesBetween90to180
+			 getDistanceWhenAngleLiesBetween180to270
+			 getDistanceWhenAngleLiesBetween270to360
+			4 functions take playerX,playerY,playerAngle 
+
+		*/
+		/*while (stepX<=10&&stepY<=10)
 		{
 
 			if((dY + stepY) / sin(playerAngle) < (dX + stepX) / cos(playerAngle))
@@ -96,11 +111,10 @@ int main()
 					}
 				stepX++;
 			}
-		}
-		
-		}
+		}*/
+				}
 
-		string displayText = "X:" + to_string(playerX) + ",Y:" + to_string(playerY) + ",A:" + to_string(Convert(playerAngle)) + ",nWX:" + to_string(rayX) + ",nWY:" + to_string(rayY)+",dist:"+to_string(centerLineDistance);
+		string displayText = "X:" + to_string(playerX) + ",Y:" + to_string(playerY) + ",A:" + to_string(Convert(playerAngle)) + /*",nWX:" + to_string(rayX) + ",nWY:" + to_string(rayY)+*/",dist:"+to_string(centerLineDistance);
 		t.setString(displayText);
 		t.setFont(font);
 		t.setCharacterSize(14);
