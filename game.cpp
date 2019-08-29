@@ -87,6 +87,7 @@ int main()
 				rayX = playerX+stepX;
 				if(World[rayX][rayY])
 				{
+					if(Convert(playerAngle))
 						centerLineDistance = (dY + stepY) / sin(playerAngle);
 						break;
 				}
