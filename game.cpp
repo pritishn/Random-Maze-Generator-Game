@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 #include <SFML/Graphics.hpp>
+#define pi 3.1415926535897932384626
 using namespace std;
+
 int World[10][10] =
 	{
 		{1,1,1,1,1,1,1,1,1,1},
@@ -17,7 +19,6 @@ int World[10][10] =
 
 double Convert(double radian)
 {
-	double pi = 3.14159;
 	return (radian * (180 / pi));
 }
 
@@ -26,7 +27,7 @@ int main()
 
 	sf::RenderWindow window(sf::VideoMode(700, 700), "Prototype!");
 	window.setFramerateLimit(60);
-
+	int c;
 	double centerLineDistance=0.0;
 	double playerX = 4.0, playerY = 4.0;
 	double playerAngle = 0.0;
@@ -45,11 +46,7 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
-		dX = ceil(playerX) - playerX;
-		dY = playerY - floor(playerY);
-		stepX = 0;
-		stepY = 0;
-		int rayX = 0, rayY = 0;
+		
 		if (sf::Event::KeyPressed){
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -65,32 +62,28 @@ int main()
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			playerAngle += 0.0001;
+			playerAngle += 0.001;
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			playerAngle -= 0.0001;
+			playerAngle -= 0.001;
 
-		/*
-			*** put a function to keep player angle under 2pie ***
+		playerAngle=(playerAngle>=pi)?playerAngle-pi:playerAngle;
+		playerAngle = (playerAngle<=-pi) ? playerAngle + pi : playerAngle;
+		playerAngle = (playerAngle<0)?pi-playerAngle:playerAngle;
+		int rayX = 0, rayY = 0;
+		rayX = playerX;
+		rayY = playerY;
+		dX = ceil(playerX) - playerX;
+		dY = playerY - floor(playerY);
+		stepX = 0;
+		stepY = 0;
+		
 
-		*/
-		/*
-
-			put 4 functions to calculate distances 
-			function to represent each quadrants 
-			 getDistanceWhenAngleLiesBetween0to90
-			 getDistanceWhenAngleLiesBetween90to180
-			 getDistanceWhenAngleLiesBetween180to270
-			 getDistanceWhenAngleLiesBetween270to360
-			4 functions take playerX,playerY,playerAngle 
-
-		*/
-		/*while (stepX<=10&&stepY<=10)
+		while (stepX<=10&&stepY<=10)
 		{
-
-			if((dY + stepY) / sin(playerAngle) < (dX + stepX) / cos(playerAngle))
+			if((dY + stepY) /sin(playerAngle) <(dX + stepX)/cos(playerAngle))
 			{
-				rayY = playerY-(dY + stepY);
+				rayY = playerY-(dY + stepY)-1;
 				rayX = playerX+stepX;
 				if(World[rayX][rayY])
 				{
@@ -101,9 +94,8 @@ int main()
 			}
 			else
 			{
-
-				rayX = playerX + (dX + stepX);
-				rayY = ceil(playerY-stepY);//+(dX+stepX)*tan(playerAngle);
+				rayX =ceil( playerX + (dX + stepX));
+				rayY =playerY-stepY;//+(dX+stepX)*tan(playerAngle);
 				if (World[rayX][rayY])
 					{
 						centerLineDistance = (dX + stepX) / cos(playerAngle);
@@ -111,16 +103,15 @@ int main()
 					}
 				stepX++;
 			}
-		}*/
-				}
+		}
 
-		string displayText = "X:" + to_string(playerX) + ",Y:" + to_string(playerY) + ",A:" + to_string(Convert(playerAngle)) + /*",nWX:" + to_string(rayX) + ",nWY:" + to_string(rayY)+*/",dist:"+to_string(centerLineDistance);
+		string displayText = "X:" + to_string(playerX) + ",Y:" + to_string(playerY) + ",A:" + to_string(Convert(playerAngle)) + ",nWX:" + to_string(rayX) + ",nWY:" + to_string(rayY) + ",dist:" + to_string(centerLineDistance) + " " + to_string(c);
 		t.setString(displayText);
 		t.setFont(font);
 		t.setCharacterSize(14);
 		window.clear();
 		window.draw(t);
 		window.display();
-	}
+	}}
 	return 0;
 }
