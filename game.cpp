@@ -17,10 +17,10 @@ int World[10][10] =
 		{1,1,1,1,1,1,1,1,1,1}
 	};
 
-int main()
+int main(void)
 {
 
-	sf::RenderWindow window(sf::VideoMode(400, 400), "Prototype!");
+	sf::RenderWindow window(sf::VideoMode(400, 400), "Test Render");
 	int h=400;
 	window.setFramerateLimit(45);
 	string c;

@@ -3,8 +3,8 @@ A game making project in C++.
 
 # Dependencies:
  SFML Library
+
 # Installation Instructions:
- 
  Debian:
     
     sudo apt-get install libsfml-dev
