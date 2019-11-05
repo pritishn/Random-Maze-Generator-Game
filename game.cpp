@@ -47,6 +47,7 @@ class  Ray
 
 int main(void)
 {
+	
 
 	const int h=800;
 	sf::RenderWindow window(sf::VideoMode(h, 3*h/4), "Test Render");
