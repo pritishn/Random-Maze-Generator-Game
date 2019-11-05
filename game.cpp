@@ -17,19 +17,51 @@ int World[10][10] =
 		{1,1,1,1,1,1,1,1,1,1}
 	};
 
+class  Player
+{
+public:
+	double X,Y,Angle,StepSize;
+
+	Player(double playerX,double playerY,double playerAngle,double playerStepSize)
+	{
+		X=playerX;
+		Y=playerY;
+		Angle=playerAngle;
+		StepSize=playerStepSize;
+	}
+
+	 
+};
+class  Ray
+{
+	public:
+	double X,Y;
+
+	Ray(int rayX=0.0,int rayY=0.0)
+	{
+		X=rayX;Y=rayY;
+	}
+	
+	
+};
+
 int main(void)
 {
 
-	sf::RenderWindow window(sf::VideoMode(400, 400), "Test Render");
-	int h=400;
+	const int h=800;
+	sf::RenderWindow window(sf::VideoMode(h, 3*h/4), "Test Render");
 	window.setFramerateLimit(45);
+
 	string c;
-	int rayX = 0, rayY = 0;
-	double centerLineDistance=0.0;
-	double playerX = 4.0, playerY = 4.0;
-	double playerAngle = 0.0;
+	// int ray.X = 0, ray.Y = 0;
+	// double player.X = 4.0, player.Y = 4.0;
+	// double player.Angle = 0.0;
 	
-	double playerStepSize = 0.04;
+	// double player.StepSize = 0.04;
+	//Player(double player.X,double player.Y,double player.Angle,double player.StepSize)
+	Player player(4.0,4.0,0.0,0.04);
+	Ray ray(0.0,0.0);
+
 	sf::Text t;
 	sf::Font font;
 	font.loadFromFile("Arial.ttf");
@@ -53,45 +85,45 @@ int main(void)
 			window.clear();
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
-				if (World[(int)(playerX + playerStepSize * cos(playerAngle))][(int)playerY] == 1)
-					playerX += 0;
+				if (World[(int)(player.X + player.StepSize * cos(player.Angle))][(int)player.Y] == 1)
+					player.X += 0;
 				else
-					playerX += playerStepSize * cos(playerAngle);
-				if (World[(int)playerX][(int)(playerY + playerStepSize * sin(playerAngle))] == 1)
-					playerY += 0;
+					player.X += player.StepSize * cos(player.Angle);
+				if (World[(int)player.X][(int)(player.Y + player.StepSize * sin(player.Angle))] == 1)
+					player.Y += 0;
 				else
-					playerY += playerStepSize * sin(playerAngle);
+					player.Y += player.StepSize * sin(player.Angle);
 			}
 	 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 			{
-				if(World[(int)(playerX - playerStepSize * cos(playerAngle))][(int)playerY]==1)
-				playerX -=0;
+				if(World[(int)(player.X - player.StepSize * cos(player.Angle))][(int)player.Y]==1)
+				player.X -=0;
 				else
-				playerX -= playerStepSize * cos(playerAngle);
+				player.X -= player.StepSize * cos(player.Angle);
 
-				if (World[(int)playerX][(int)(playerY - playerStepSize * sin(playerAngle))] == 1)
-					playerY -= 0;
+				if (World[(int)player.X][(int)(player.Y - player.StepSize * sin(player.Angle))] == 1)
+					player.Y -= 0;
 				else
-					playerY -= playerStepSize * sin(playerAngle);
+					player.Y -= player.StepSize * sin(player.Angle);
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				playerAngle -= 0.03;
+				player.Angle -= 0.03;
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				playerAngle += 0.03;
+				player.Angle += 0.03;
 		// keyboard input events end here....**************************************************************
 
 
 
-		for(int i=0;i<700;i++)
+		for(int i=0;i<h;i++)
 		{
 
-			double direX =cos(playerAngle), direY=sin(playerAngle);
-			double rotatingAngle=(pi)/1200.00;
+			double direX =cos(player.Angle), direY=sin(player.Angle);
+			double rotatingAngle=(pi)/((double)(h*4));
 			double dirX=cos(rotatingAngle*i)*direX-sin(rotatingAngle*i)*direY;
 
 			double dirY = cos(rotatingAngle*i) * direY + sin(rotatingAngle*i) * direX;
-			int mapX = int(playerX);
-			int mapY = int(playerY);
+			int mapX = int(player.X);
+			int mapY = int(player.Y);
 			double rayDirX = dirX ; //planeX * cameraX;
 			double rayDirY = dirY ;// planeY * cameraX;
 
@@ -114,22 +146,22 @@ int main(void)
 			if (rayDirX < 0)
 			{
 				stepX = -1;
-				sideDistX = (playerX - mapX) * deltaDistX;
+				sideDistX = (player.X - mapX) * deltaDistX;
 			}
 			else
 			{
 				stepX = 1;
-				sideDistX = (mapX + 1.0 - playerX) * deltaDistX;
+				sideDistX = (mapX + 1.0 - player.X) * deltaDistX;
 			}
 			if (rayDirY < 0)
 			{
 				stepY = -1;
-				sideDistY = (playerY - mapY) * deltaDistY;
+				sideDistY = (player.Y - mapY) * deltaDistY;
 			}
 			else
 			{
 				stepY = 1;
-				sideDistY = (mapY + 1.0 - playerY) * deltaDistY;
+				sideDistY = (mapY + 1.0 - player.Y) * deltaDistY;
 			}
 			//perform DDA
 			while (hit == 0)
@@ -153,9 +185,9 @@ int main(void)
 			}
 			//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
 			if (side == 0)
-				perpWallDist = (mapX - playerX + (1 - stepX) / 2) / rayDirX;
+				perpWallDist = (mapX - player.X + (1 - stepX) / 2) / rayDirX;
 			else
-				perpWallDist = (mapY - playerY + (1 - stepY) / 2) / rayDirY;
+				perpWallDist = (mapY - player.Y + (1 - stepY) / 2) / rayDirY;
 		
 			int lineHeight = (int)(h / perpWallDist);
 
@@ -167,14 +199,20 @@ int main(void)
 			if (drawEnd >= h)
 				drawEnd = h - 1;
 
-			sf::VertexArray triangle(sf::Triangles, 2);
 
+//---------------------------------------- after determining distance from wall hit  , creating illusion of 3D by rendering proportionately tall lines --------------------------- 
+			// rendering lines using the help of line objects  
+			// for rendering walls
 			sf::Vertex line[] =
-				{
+			{
 					sf::Vertex(sf::Vector2f(i, drawStart)),
-					sf::Vertex(sf::Vector2f(i, drawEnd))};
+					sf::Vertex(sf::Vector2f(i, drawEnd))
+			};
 			
-			if(side==1){line[0].color = sf::Color(255,0,0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
+			//chooses different shades of colours for adjacent sides
+			if(side==1)
+			{
+				line[0].color = sf::Color(255,0,0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 				line[1].color = sf::Color(255, 0, 0, 255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 			}
 			else
@@ -183,16 +221,28 @@ int main(void)
 				line[1].color = sf::Color(128, 0, 0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 			}
 
+			//for rendereing floor 
 			sf::Vertex floor[] =
-				{sf::Vertex(sf::Vector2f(i, drawEnd), sf::Color(0, 0, 255, 255 - 255 * (1.0 - (drawEnd * 2) / (double)h))),sf::Vertex(sf::Vector2f(i, h), sf::Color(0, 0, 255, 255 ))};
+			{
+				sf::Vertex(sf::Vector2f(i, drawEnd), sf::Color(0, 0, 255, 255 - 255 * (1.0 - (drawEnd * 2) / (double)h))),sf::Vertex(sf::Vector2f(i, h), sf::Color(0, 0, 255, 255 ))
+			};
 
+			//for rendering ceiling 
 			sf::Vertex ceilings[] =
-				{sf::Vertex(sf::Vector2f(i, 0), sf::Color(128, 128, 128, 255)),sf::Vertex(sf::Vector2f(i, drawStart), sf::Color(128, 128,128, 255))};
+			{
+				sf::Vertex(sf::Vector2f(i, 0), sf::Color(128, 128, 128, 255)),sf::Vertex(sf::Vector2f(i, drawStart), sf::Color(128, 128,128, 255))
+			};
+			// buffer the renderer for each column 
 			window.draw(ceilings, 2, sf::Lines);
 			window.draw(floor, 2, sf::Lines);
 			window.draw(line, 2, sf::Lines);
+
+//--------------------------line drawing for current pixel column Complete , loop proceeds to next column  --------------------------------------------------------------------------
 		}
+
+// -----------------finally rendering the buffered  screen --------------------------------------------------------------------------------------------------------------------------
 			window.display();
 	}}
+
 	return 0;
 }
