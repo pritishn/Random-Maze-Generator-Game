@@ -8,9 +8,9 @@ int World[10][10] =
 		{1,1,1,1,1,1,1,1,1,1},
 		{1,1,0,0,0,0,0,0,0,1},
 		{1,0,1,0,0,0,0,0,0,1},
-		{1,0,0,1,0,0,0,0,0,1},
+		{1,1,1,1,1,1,1,1,1,1},
 		{1,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,1,0,0,0,1},
+		{1,1,1,1,1,1,1,1,1,1},
 		{1,0,0,0,0,0,1,0,0,1},
 		{1,0,0,0,0,0,0,1,0,1},
 		{1,0,0,0,0,0,0,0,1,1},
@@ -47,19 +47,12 @@ class  Ray
 
 int main(void)
 {
-	
 
 	const int h=800;
 	sf::RenderWindow window(sf::VideoMode(h, 3*h/4), "Test Render");
 	window.setFramerateLimit(45);
-
-	string c;
-	// int ray.X = 0, ray.Y = 0;
-	// double player.X = 4.0, player.Y = 4.0;
-	// double player.Angle = 0.0;
 	
-	// double player.StepSize = 0.04;
-	//Player(double player.X,double player.Y,double player.Angle,double player.StepSize)
+	string c;
 	Player player(4.0,4.0,0.0,0.04);
 	Ray ray(0.0,0.0);
 
@@ -86,26 +79,26 @@ int main(void)
 			window.clear();
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
-				if (World[(int)(player.X + player.StepSize * cos(player.Angle))][(int)player.Y] == 1)
+				if (World[(int)(player.X + player.StepSize * cos(player.Angle+pi/8))][(int)player.Y] == 1)
 					player.X += 0;
 				else
-					player.X += player.StepSize * cos(player.Angle);
-				if (World[(int)player.X][(int)(player.Y + player.StepSize * sin(player.Angle))] == 1)
+					player.X += player.StepSize * cos(player.Angle+pi/8);
+				if (World[(int)player.X][(int)(player.Y + player.StepSize * sin(player.Angle+pi/8))] == 1)
 					player.Y += 0;
 				else
-					player.Y += player.StepSize * sin(player.Angle);
+					player.Y += player.StepSize * sin(player.Angle+pi/8);
 			}
 	 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 			{
-				if(World[(int)(player.X - player.StepSize * cos(player.Angle))][(int)player.Y]==1)
+				if(World[(int)(player.X - player.StepSize * cos(player.Angle+pi/8))][(int)player.Y]==1)
 				player.X -=0;
 				else
-				player.X -= player.StepSize * cos(player.Angle);
+				player.X -= player.StepSize * cos(player.Angle+pi/8);
 
-				if (World[(int)player.X][(int)(player.Y - player.StepSize * sin(player.Angle))] == 1)
+				if (World[(int)player.X][(int)(player.Y - player.StepSize * sin(player.Angle+pi/8))] == 1)
 					player.Y -= 0;
 				else
-					player.Y -= player.StepSize * sin(player.Angle);
+					player.Y -= player.StepSize * sin(player.Angle+pi/8);
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 				player.Angle -= 0.03;
@@ -189,7 +182,8 @@ int main(void)
 				perpWallDist = (mapX - player.X + (1 - stepX) / 2) / rayDirX;
 			else
 				perpWallDist = (mapY - player.Y + (1 - stepY) / 2) / rayDirY;
-		
+			
+			perpWallDist=perpWallDist/cos(2*rotatingAngle);
 			int lineHeight = (int)(h / perpWallDist);
 
 			//calculate lowest and highest pixel to fill in current stripe
@@ -213,7 +207,7 @@ int main(void)
 			//chooses different shades of colours for adjacent sides
 			if(side==1)
 			{
-				line[0].color = sf::Color(255,0,0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
+				line[0].color = sf::Color(255,255,0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 				line[1].color = sf::Color(255, 0, 0, 255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 			}
 			else
