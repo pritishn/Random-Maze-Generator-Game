@@ -3,19 +3,177 @@
 #define pi 3.1415926535897932384626
 using namespace std;
 
-int World[10][10] =
+int World[32][32];
+//Code by Jacek Wieczorek
+typedef struct
+{
+	int x, y; //Node position - little waste of memory, but it allows faster generation
+	void *parent; //Pointer to parent node
+	int c; //Character to be displayed
+	char dirs; //Directions that still haven't been explored
+} Node;
+
+Node *nodes; //Nodes array
+int N; //Maze dimension
+int won=0,helptaken=0;
+
+
+int init( )
+{
+	int i, j;
+	Node *n;
+	
+	//Allocate memory for maze
+	nodes =(Node*) calloc( N * N, sizeof(Node) );
+	if ( nodes == NULL ) return 1;
+		
+	//Setup crucial nodes
+	for ( i = 0; i < N; i++ )
 	{
-		{1,1,1,1,1,1,1,1,1,1},
-		{1,1,0,0,0,0,0,0,0,1},
-		{1,0,1,0,0,0,0,0,0,1},
-		{1,1,1,1,1,1,1,1,1,1},
-		{1,0,0,0,0,0,0,0,0,1},
-		{1,1,1,1,1,1,1,1,1,1},
-		{1,0,0,0,0,0,1,0,0,1},
-		{1,0,0,0,0,0,0,1,0,1},
-		{1,0,0,0,0,0,0,0,1,1},
-		{1,1,1,1,1,1,1,1,1,1}
-	};
+		for ( j = 0; j < N; j++ )
+		{
+			n = nodes + i + j * N;
+			if ( i * j % 2 ) 
+			{
+				n->x = i;
+				n->y = j;
+				n->dirs = 15; //Assume that all directions can be explored (4 youngest bits set)
+				n->c = 0; 
+			}
+			else n->c = 1; //Add walls between nodes
+		}
+
+	}
+
+	return 0;
+}
+
+Node *link( Node *n )
+{
+	//Connects node to random neighbor (if possible) and returns
+	//address of next node that should be visited
+
+	int x, y;
+	char dir;
+	Node *dest;
+	
+	//Nothing can be done if null pointer is given - return
+	if ( n == NULL ) return NULL;
+	
+	//While there are directions still unexplored
+	while ( n->dirs )
+	{
+		//Randomly pick one direction
+		dir = ( 1 << ( rand( ) % 4 ) );
+		
+		//If it has already been explored - try again
+		if ( ~n->dirs & dir ) continue;
+		
+		//Mark direction as explored
+		n->dirs &= ~dir;
+		
+		//Depending on chosen direction
+		switch ( dir )
+		{
+			//Check if it's possible to go right
+			case 1:
+				if ( n->x + 2 < N )
+				{
+					x = n->x + 2;
+					y = n->y;
+				}
+				else continue;
+				break;
+			
+			//Check if it's possible to go down
+			case 2:
+				if ( n->y + 2 < N )
+				{
+					x = n->x;
+					y = n->y + 2;
+				}
+				else continue;
+				break;
+			
+			//Check if it's possible to go left	
+			case 4:
+				if ( n->x - 2 >= 0 )
+				{
+					x = n->x - 2;
+					y = n->y;
+				}
+				else continue;
+				break;
+			
+			//Check if it's possible to go up
+			case 8:
+				if ( n->y - 2 >= 0 )
+				{
+					x = n->x;
+					y = n->y - 2;
+				}
+				else continue;
+				break;
+		}
+		
+		//Get destination node into pointer (makes things a tiny bit faster)
+		dest = nodes + x + y * N;
+		
+		//Make sure that destination node is not a wall
+		if ( dest->c == 0 )
+		{
+			//If destination is a linked node already - abort
+			if ( dest->parent != NULL ) continue;
+			
+			//Otherwise, adopt node
+			dest->parent = n;
+			
+			//Remove wall between nodes
+			nodes[n->x + ( x - n->x ) / 2 + ( n->y + ( y - n->y ) / 2 ) * N].c = 0;
+			
+			//Return address of the child node
+			return dest;
+		}
+	}
+	
+	//If nothing more can be done here - return parent's address
+	return (Node*)n->parent;
+}
+
+void draw( )
+{
+	int i, j;
+
+	//Outputs maze to terminal - nothing special
+	for ( i = 0; i < 32; i++ )
+	{
+		for ( j = 0; j < 32; j++ )
+		{
+			if(i<N&&j<N)
+			World[i][j]=nodes[j + i * N].c;
+		else World[i][j]=1;
+		}
+	}
+}
+
+void generateMaze( int x)
+{
+	Node *start, *last;
+	N=x;
+	//Seed random generator
+	srand( time( NULL ) );
+	
+	//Initialize maze
+ 	if(init( )){cout<<"Cannot Allocate enough memory!";exit(0);}
+	//Setup start node
+	start = nodes + 1 + N;
+	start->parent = start;
+	last = start;
+	
+	//Connect nodes until start node is reached and can't be left
+	while ( ( last = link( last ) ) != start );
+	draw( );
+}
 
 class  Player
 {
@@ -32,6 +190,7 @@ public:
 
 	 
 };
+
 class  Ray
 {
 	public:
@@ -41,26 +200,45 @@ class  Ray
 	{
 		X=rayX;Y=rayY;
 	}
-	
-	
 };
 
 int main(void)
 {
-
+	cout<<"Enter a Odd number between 7 to 31 to set as maze dimension:";
+	cin>>N;
+	if(N%2==0){
+		cout<<"Odd number not provided ! Exiting the game !";
+		exit(0);
+	}else if(N<7)
+	{
+		cout<<"Size specified is less than 7! Exiting the game!";
+		exit(0);
+	}
+	else if(N>31)
+	{
+		cout<<"Size specified is more than 31! Exiting the game!";
+		exit(0);
+	}
+	generateMaze(N);
 	const int h=800;
 	sf::RenderWindow window(sf::VideoMode(h, 3*h/4), "Test Render");
 	window.setFramerateLimit(45);
 	
-	string c;
-	Player player(4.0,4.0,0.0,0.04);
+
+	Player player(1.5,1.5,0.0,0.04);
 	Ray ray(0.0,0.0);
 
-	sf::Text t;
+	sf::Text t,th;
 	sf::Font font;
 	font.loadFromFile("Arial.ttf");
-
+	t.setFont(font);
+	t.setString("Congrats! You WON WITHOUT USING HELP!!!! \n Press  Q  Key to end the game!");
+	th.setFont(font);
+	th.setString("You have completed the level ! \n Try to do it without using map next time :)\n Press  Q  Key to end the game!");
+	sf::Text hm;
+	hm.setFont(font);
 	
+
 	while (window.isOpen())
 	{
 		
@@ -104,6 +282,27 @@ int main(void)
 				player.Angle -= 0.03;
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 				player.Angle += 0.03;
+			while(sf::Keyboard::isKeyPressed(sf::Keyboard::H))
+			{
+				string helpmap;
+				if(won==0)
+				helptaken=1;
+				for(int i=0;i<N;i++)
+				{
+					for(int j=N-1;j>=0;j--)
+					{
+						if((int)player.X==i&&(int)player.Y==j)
+							helpmap+='o';
+						else if(World[i][j]==1)helpmap+="#";
+						else 	helpmap=helpmap+"_";
+					}
+					helpmap+="\n";
+				}
+				hm.setFont(font);
+				hm.setString(helpmap);
+				window.draw(hm);
+				window.display();
+			}
 		// keyboard input events end here....**************************************************************
 
 
@@ -183,7 +382,7 @@ int main(void)
 			else
 				perpWallDist = (mapY - player.Y + (1 - stepY) / 2) / rayDirY;
 			
-			perpWallDist=perpWallDist/cos(2*rotatingAngle);
+			//perpWallDist=perpWallDist/cos(2*rotatingAngle);
 			int lineHeight = (int)(h / perpWallDist);
 
 			//calculate lowest and highest pixel to fill in current stripe
@@ -207,7 +406,7 @@ int main(void)
 			//chooses different shades of colours for adjacent sides
 			if(side==1)
 			{
-				line[0].color = sf::Color(255,255,0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
+				line[0].color = sf::Color(255,0,0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 				line[1].color = sf::Color(255, 0, 0, 255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 			}
 			else
@@ -225,17 +424,30 @@ int main(void)
 			//for rendering ceiling 
 			sf::Vertex ceilings[] =
 			{
-				sf::Vertex(sf::Vector2f(i, 0), sf::Color(128, 128, 128, 255)),sf::Vertex(sf::Vector2f(i, drawStart), sf::Color(128, 128,128, 255))
+				sf::Vertex(sf::Vector2f(i, 0), sf::Color(25, 25 , 25 ,225)),sf::Vertex(sf::Vector2f(i, drawStart), sf::Color(25, 25,25, 225))
 			};
 			// buffer the renderer for each column 
 			window.draw(ceilings, 2, sf::Lines);
 			window.draw(floor, 2, sf::Lines);
 			window.draw(line, 2, sf::Lines);
 
+			
+
 //--------------------------line drawing for current pixel column Complete , loop proceeds to next column  --------------------------------------------------------------------------
 		}
 
 // -----------------finally rendering the buffered  screen --------------------------------------------------------------------------------------------------------------------------
+		    if(won){
+		    		if((sf::Keyboard::isKeyPressed(sf::Keyboard::Q)))
+					exit(0);
+					
+		    	if(helptaken==0)window.draw(t);else window.draw(th);
+		    }
+		   
+			if((int)player.X==N-2&&(int)player.Y==N-2){
+				won=1;
+				
+			}
 			window.display();
 	}}
 
