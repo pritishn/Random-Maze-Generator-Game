@@ -4,7 +4,6 @@
 using namespace std;
 
 int World[32][32];
-//Code by Jacek Wieczorek
 typedef struct
 {
 	int x, y; //Node position - little waste of memory, but it allows faster generation
@@ -35,6 +34,7 @@ int init( )
 			n = nodes + i + j * N;
 			if ( i * j % 2 ) 
 			{
+				//cout<<i<<","<<j<<endl;
 				n->x = i;
 				n->y = j;
 				n->dirs = 15; //Assume that all directions can be explored (4 youngest bits set)
@@ -65,13 +65,10 @@ Node *link( Node *n )
 	{
 		//Randomly pick one direction
 		dir = ( 1 << ( rand( ) % 4 ) );
-		
 		//If it has already been explored - try again
 		if ( ~n->dirs & dir ) continue;
-		
 		//Mark direction as explored
 		n->dirs &= ~dir;
-		
 		//Depending on chosen direction
 		switch ( dir )
 		{
@@ -137,6 +134,7 @@ Node *link( Node *n )
 	}
 	
 	//If nothing more can be done here - return parent's address
+	//cout<<(n->x)<<" "<<(n->y)<<endl;
 	return (Node*)n->parent;
 }
 
@@ -221,9 +219,8 @@ int main(void)
 	}
 	generateMaze(N);
 	const int h=800;
-	sf::RenderWindow window(sf::VideoMode(h, 3*h/4), "Test Render");
+	sf::RenderWindow window(sf::VideoMode(h, 3*h/4), "Random Maze Game!");
 	window.setFramerateLimit(45);
-	
 
 	Player player(1.5,1.5,0.0,0.04);
 	Ray ray(0.0,0.0);
@@ -231,10 +228,12 @@ int main(void)
 	sf::Text t,th;
 	sf::Font font;
 	font.loadFromFile("Arial.ttf");
-	t.setFont(font);
-	t.setString("Congrats! You WON WITHOUT USING HELP!!!! \n Press  Q  Key to end the game!");
-	th.setFont(font);
-	th.setString("You have completed the level ! \n Try to do it without using map next time :)\n Press  Q  Key to end the game!");
+	t.setFont(font);t.setCharacterSize(18);
+	th.setFont(font);th.setCharacterSize(18);
+	
+	th.setString("You have completed the level ! \n Try to do it without using map next time :)");
+	t.setString("Congrats! You WON WITHOUT USING HELP!!!! \n Press  Q Arrow Key to end the game!");
+	
 	sf::Text hm;
 	hm.setFont(font);
 	
@@ -411,20 +410,22 @@ int main(void)
 			}
 			else
 			{
-				line[0].color = sf::Color(128, 0, 0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
+				line[0].color = sf::Color(128, 0 , 0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 				line[1].color = sf::Color(128, 0, 0,255 - 255 * (1.0 - (drawEnd * 2) / (double)h));
 			}
 
 			//for rendereing floor 
 			sf::Vertex floor[] =
 			{
-				sf::Vertex(sf::Vector2f(i, drawEnd), sf::Color(0, 0, 255, 255 - 255 * (1.0 - (drawEnd * 2) / (double)h))),sf::Vertex(sf::Vector2f(i, h), sf::Color(0, 0, 255, 255 ))
+				sf::Vertex(sf::Vector2f(i, drawEnd), sf::Color(0, 0, 255, 255 - 255 * (1.0 - (drawEnd * 2) / (double)h))),
+				sf::Vertex(sf::Vector2f(i, h), sf::Color(0, 0, 255, 255 ))
 			};
 
 			//for rendering ceiling 
 			sf::Vertex ceilings[] =
 			{
-				sf::Vertex(sf::Vector2f(i, 0), sf::Color(25, 25 , 25 ,225)),sf::Vertex(sf::Vector2f(i, drawStart), sf::Color(25, 25,25, 225))
+				sf::Vertex(sf::Vector2f(i, 0), sf::Color(25, 25 , 25 ,225)),
+				sf::Vertex(sf::Vector2f(i, drawStart), sf::Color(25, 25,25, 225))
 			};
 			// buffer the renderer for each column 
 			window.draw(ceilings, 2, sf::Lines);
@@ -439,17 +440,18 @@ int main(void)
 // -----------------finally rendering the buffered  screen --------------------------------------------------------------------------------------------------------------------------
 		    if(won){
 		    		if((sf::Keyboard::isKeyPressed(sf::Keyboard::Q)))
-					exit(0);
+						exit(0);
 					
-		    	if(helptaken==0)window.draw(t);else window.draw(th);
-		    }
-		   
+					
+		    	if(helptaken==0)window.draw(t);else window.draw(th);}
+		   	
 			if((int)player.X==N-2&&(int)player.Y==N-2){
 				won=1;
 				
 			}
 			window.display();
-	}}
+	}
+	}
 
 	return 0;
 }
