@@ -231,7 +231,7 @@ int main(void)
 	t.setFont(font);t.setCharacterSize(18);
 	th.setFont(font);th.setCharacterSize(18);
 	
-	th.setString("You have completed the level ! \n Try to do it without using map next time :)");
+	th.setString("You have completed the level ! \n Try to do it without using map next time :)\n Press  Q Arrow Key to end the game!");
 	t.setString("Congrats! You WON WITHOUT USING HELP!!!! \n Press  Q Arrow Key to end the game!");
 	
 	sf::Text hm;
@@ -316,10 +316,10 @@ int main(void)
 			double dirY = cos(rotatingAngle*i) * direY + sin(rotatingAngle*i) * direX;
 			int mapX = int(player.X);
 			int mapY = int(player.Y);
-			double rayDirX = dirX ; //planeX * cameraX;
-			double rayDirY = dirY ;// planeY * cameraX;
+			ray.X = dirX ; //planeX * cameraX;
+			 ray.Y = dirY ;// planeY * cameraX;
 
-			//length of ray from current position to next x or y-side
+		//length of ray from current position to next x or y-side
 			double sideDistX;
 			double sideDistY;
 
@@ -335,7 +335,7 @@ int main(void)
 			int hit = 0; //was there a wall hit?
 			int side;	//was a NS or a EW wall hit?
 			//calculate step and initial sideDist
-			if (rayDirX < 0)
+			if (ray.X < 0)
 			{
 				stepX = -1;
 				sideDistX = (player.X - mapX) * deltaDistX;
@@ -345,7 +345,7 @@ int main(void)
 				stepX = 1;
 				sideDistX = (mapX + 1.0 - player.X) * deltaDistX;
 			}
-			if (rayDirY < 0)
+			if (ray.Y < 0)
 			{
 				stepY = -1;
 				sideDistY = (player.Y - mapY) * deltaDistY;
@@ -377,9 +377,9 @@ int main(void)
 			}
 			//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
 			if (side == 0)
-				perpWallDist = (mapX - player.X + (1 - stepX) / 2) / rayDirX;
+				perpWallDist = (mapX - player.X + (1 - stepX) / 2) / ray.X;
 			else
-				perpWallDist = (mapY - player.Y + (1 - stepY) / 2) / rayDirY;
+				perpWallDist = (mapY - player.Y + (1 - stepY) / 2) / ray.Y;
 			
 			//perpWallDist=perpWallDist/cos(2*rotatingAngle);
 			int lineHeight = (int)(h / perpWallDist);
