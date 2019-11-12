@@ -34,7 +34,7 @@ int init( )
 			n = nodes + i + j * N;
 			if ( i * j % 2 ) 
 			{
-				//cout<<i<<","<<j<<endl;
+				cout<<i<<","<<j<<endl;
 				n->x = i;
 				n->y = j;
 				n->dirs = 15; //Assume that all directions can be explored (4 youngest bits set)
@@ -218,8 +218,9 @@ int main(void)
 		exit(0);
 	}
 	generateMaze(N);
+
 	const int h=800;
-	sf::RenderWindow window(sf::VideoMode(h, 3*h/4), "Random Maze Game!");
+	sf::RenderWindow window(sf::VideoMode(3*h/4, h), "Random Maze Game!");
 	window.setFramerateLimit(45);
 
 	Player player(1.5,1.5,0.0,0.04);
@@ -231,8 +232,8 @@ int main(void)
 	t.setFont(font);t.setCharacterSize(18);
 	th.setFont(font);th.setCharacterSize(18);
 	
-	th.setString("You have completed the level ! \n Try to do it without using map next time :)\n Press  Q Arrow Key to end the game!");
-	t.setString("Congrats! You WON WITHOUT USING HELP!!!! \n Press  Q Arrow Key to end the game!");
+	th.setString("You have completed the level ! \n Try to do it without using map next time :)\n Press  Q Key to end the game!");
+	t.setString("Congrats! You WON WITHOUT USING HELP!!!! \n Press  Q  Key to end the game!");
 	
 	sf::Text hm;
 	hm.setFont(font);
@@ -254,6 +255,8 @@ int main(void)
 		// keyboard input events....*********************************************************************
 		if (sf::Event::KeyPressed){
 			window.clear();
+			if((sf::Keyboard::isKeyPressed(sf::Keyboard::Q)))
+						exit(0);
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
 				if (World[(int)(player.X + player.StepSize * cos(player.Angle+pi/8))][(int)player.Y] == 1)
@@ -438,16 +441,10 @@ int main(void)
 		}
 
 // -----------------finally rendering the buffered  screen --------------------------------------------------------------------------------------------------------------------------
-		    if(won){
-		    		if((sf::Keyboard::isKeyPressed(sf::Keyboard::Q)))
-						exit(0);
-					
-					
-		    	if(helptaken==0)window.draw(t);else window.draw(th);}
+		    if(won){if(helptaken==0)window.draw(t);else window.draw(th);}
 		   	
 			if((int)player.X==N-2&&(int)player.Y==N-2){
 				won=1;
-				
 			}
 			window.display();
 	}
