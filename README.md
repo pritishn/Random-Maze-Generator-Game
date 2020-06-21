@@ -6,6 +6,8 @@ A game making project in C++.
 
 # Installation Instructions:
  Debian:
+share improve this answer
+
     
     sudo apt-get install libsfml-dev
   
@@ -15,9 +17,5 @@ A game making project in C++.
 
 # Running the game
     ./sfml-app
-    
-# Screenshot
-
-![hello](index.png)
 
   
