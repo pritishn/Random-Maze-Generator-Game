@@ -15,5 +15,9 @@ A game making project in C++.
 
 # Running the game
     ./sfml-app
+    
+# Screenshot
+
+![hello](index.png)
 
   
