@@ -3,187 +3,66 @@
 #define pi 3.1415926535897932384626
 using namespace std;
 
-int World[32][32];
-typedef struct
-{
-	int x, y;	  //Node position - little waste of memory, but it allows faster generation
-	void *parent; //Pointer to parent node
-	int c;		  //Character to be displayed
-	char dirs;	  //Directions that still haven't been explored
-} Node;
-
-Node *nodes; //Nodes array
+int World[50][50];
 int N;		 //Maze dimension
 int won = 0, helptaken = 0;
-
-int init()
+void divideSection(int sx,int sy,int ex,int ey)
 {
-	int i, j;
-	Node *n;
+	if(ex-sx<2||ey-sy<2)return;
 
-	//Allocate memory for maze
-	nodes = (Node *)calloc(N * N, sizeof(Node));
-	if (nodes == NULL)
-		return 1;
+	int wallMidX=sx+1+rand()%(ex-sx-1);
+	int wallMidY=sy+1+rand()%(ey-sy-1);
 
-	//Setup crucial nodes
-	for (i = 0; i < N; i++)
+	for(int i=sy;i<=ey;i++)
+		World[wallMidX][i]=1;
+
+	for(int i=sx;i<=ex;i++)
+		World[i][wallMidY]=1;
+	
+	int not_break=rand()%4;
+
+	if(not_break!=1)
 	{
-		for (j = 0; j < N; j++)
-		{
-			n = nodes + i + j * N;
-			if (i * j % 2)
-			{
-				cout << i << "," << j << endl;
-				n->x = i;
-				n->y = j;
-				n->dirs = 15; //Assume that all directions can be explored (4 youngest bits set)
-				n->c = 0;
-			}
-			else
-				n->c = 1; //Add walls between nodes
-		}
+		int wallBreakerX=sx+rand()%((wallMidX-1)-sx+1);
+		int wallBreakerY=wallMidY;
+		World[wallBreakerX][wallBreakerY]=0;
 	}
-
-	return 0;
+	if(not_break!=2)
+	{
+		int wallBreakerX=wallMidX;
+		int wallBreakerY=wallMidY+1+rand()%(ey-(wallMidY+1)+1);
+		World[wallBreakerX][wallBreakerY]=0;
+	}
+	if(not_break!=3)
+	{
+		int wallBreakerX=wallMidX+1+rand()%(ex-(wallMidX+1)+1);
+		int wallBreakerY=wallMidY;
+		World[wallBreakerX][wallBreakerY]=0;
+	}
+	if(not_break!=4)
+	{
+		int wallBreakerX=wallMidX;
+		int wallBreakerY=sy+rand()%((wallMidY-1)-sy+1);
+		World[wallBreakerX][wallBreakerY]=0;
+	}
+	
+	divideSection(sx,sy,wallMidX-1,wallMidY-1);
+	divideSection(sx,wallMidY+1,wallMidX-1,ey);
+	divideSection(wallMidX+1,wallMidY+1,ex,ey);
+	divideSection(wallMidX+1,sy,ex,wallMidY-1);
 }
-
-Node *link(Node *n)
+void generateMaze(int n)
 {
-	//Connects node to random neighbor (if possible) and returns
-	//address of next node that should be visited
-
-	int x, y;
-	char dir;
-	Node *dest;
-
-	//Nothing can be done if null pointer is given - return
-	if (n == NULL)
-		return NULL;
-
-	//While there are directions still unexplored
-	while (n->dirs)
-	{
-		//Randomly pick one direction
-		dir = (1 << (rand() % 4));
-		//If it has already been explored - try again
-		if (~n->dirs & dir)
-			continue;
-		//Mark direction as explored
-		n->dirs &= ~dir;
-		//Depending on chosen direction
-		switch (dir)
-		{
-		//Check if it's possible to go right
-		case 1:
-			if (n->x + 2 < N)
-			{
-				x = n->x + 2;
-				y = n->y;
-			}
-			else
-				continue;
-			break;
-
-		//Check if it's possible to go down
-		case 2:
-			if (n->y + 2 < N)
-			{
-				x = n->x;
-				y = n->y + 2;
-			}
-			else
-				continue;
-			break;
-
-		//Check if it's possible to go left
-		case 4:
-			if (n->x - 2 >= 0)
-			{
-				x = n->x - 2;
-				y = n->y;
-			}
-			else
-				continue;
-			break;
-
-		//Check if it's possible to go up
-		case 8:
-			if (n->y - 2 >= 0)
-			{
-				x = n->x;
-				y = n->y - 2;
-			}
-			else
-				continue;
-			break;
-		}
-
-		//Get destination node into pointer (makes things a tiny bit faster)
-		dest = nodes + x + y * N;
-
-		//Make sure that destination node is not a wall
-		if (dest->c == 0)
-		{
-			//If destination is a linked node already - abort
-			if (dest->parent != NULL)
-				continue;
-
-			//Otherwise, adopt node
-			dest->parent = n;
-
-			//Remove wall between nodes
-			nodes[n->x + (x - n->x) / 2 + (n->y + (y - n->y) / 2) * N].c = 0;
-
-			//Return address of the child node
-			return dest;
-		}
+	srand(time(0));
+	for(int i=0;i<n+2;i++){
+		World[i][0]=1;
+		World[i][n+1]=1;
+		World[0][i]=1;
+		World[n+1][i]=1;
 	}
+	divideSection(1,1,n,n);
 
-	//If nothing more can be done here - return parent's address
-	//cout<<(n->x)<<" "<<(n->y)<<endl;
-	return (Node *)n->parent;
 }
-
-void draw()
-{
-	int i, j;
-	//Outputs maze to terminal - nothing special
-	for (i = 0; i < 32; i++)
-	{
-		for (j = 0; j < 32; j++)
-		{
-			if (i < N && j < N)
-				World[i][j] = nodes[j + i * N].c;
-			else
-				World[i][j] = 1;
-		}
-	}
-}
-
-void generateMaze(int x)
-{
-	Node *start, *last;
-	N = x;
-	//Seed random generator
-	srand(time(NULL));
-
-	//Initialize maze
-	if (init())
-	{
-		cout << "Cannot Allocate enough memory!";
-		exit(0);
-	}
-	//Setup start node
-	start = nodes + 1 + N;
-	start->parent = start;
-	last = start;
-
-	//Connect nodes until start node is reached and can't be left
-	while ((last = link(last)) != start);
-	draw();
-}
-
 class Player
 {
 public:
@@ -221,7 +100,6 @@ void checkSizeConstraint(const int N)
 }
 void runGame()
 {
-
 	const int h = 800;
 	sf::RenderWindow window(sf::VideoMode(3 * h / 4, h), "Random Maze Game!");
 	window.setFramerateLimit(45);
@@ -231,7 +109,7 @@ void runGame()
 
 	sf::Text t, th, hm;
 	sf::Font font;
-	font.loadFromFile("Arial.ttf");
+	font.loadFromFile("monospace.ttf");
 	
 	t.setFont(font);
 	th.setFont(font);
@@ -294,16 +172,16 @@ void runGame()
 				string helpmap;
 				if (won == 0)
 					helptaken = 1;
-				for (int i = 0; i < N; i++)
+				for (int i = 0; i <=N+1; i++)
 				{
-					for (int j = N - 1; j >= 0; j--)
+					for (int j = N+1; j >= 0; j--)
 					{
 						if ((int)player.X == i && (int)player.Y == j)
-							helpmap += 'o';
+							helpmap += '*';
 						else if (World[i][j] == 1)
 							helpmap += "#";
 						else
-							helpmap = helpmap + "_";
+							helpmap = helpmap + " ";
 					}
 					helpmap += "\n";
 				}
@@ -448,7 +326,7 @@ void runGame()
 					window.draw(th);
 			}
 
-			if ((int)player.X == N - 2 && (int)player.Y == N - 2)
+			if ((int)player.X == N && (int)player.Y == N )
 			{
 				won = 1;
 			}
