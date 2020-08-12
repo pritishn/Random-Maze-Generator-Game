@@ -88,12 +88,10 @@ public:
 };
 void checkSizeConstraint(const int N)
 {
-	if (N % 2 == 0)
-		cout << "Odd number not provided ! Exiting the game !";
-	else if (N < 7)
-		cout << "Size specified is less than 7! Exiting the game!";
-	else if (N > 31)
-		cout << "Size specified is more than 31! Exiting the game!";
+	if (N < 3)
+		cout << "Size specified is less than 3! Exiting the game!";
+	else if (N > 45)
+		cout << "Size specified is more than 45! Exiting the game!";
 	else
 		return;
 	exit(0);
@@ -336,7 +334,7 @@ void runGame()
 }
 int main(void)
 {
-	cout << "Enter a Odd number between 7 to 31 to set as maze dimension:";
+	cout << "Enter a number between 3 to 45 to set as maze dimension:";
 	cin >> N;
 	checkSizeConstraint(N);
 	generateMaze(N);
