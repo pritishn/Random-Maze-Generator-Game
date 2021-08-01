@@ -24,6 +24,6 @@ The world is rendered using an external library named SFML Library.
     ./playgame
   
   
-### Game demo 
+### Game demo (click on the gif to see full)
 
 [![game-demo.gif](https://s6.gifyu.com/images/game-demo.gif)](https://gifyu.com/image/1LK3)
